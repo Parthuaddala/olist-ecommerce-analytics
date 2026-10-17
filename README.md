@@ -499,12 +499,11 @@ olist-ecommerce-analytics/
 
 ---
 
+
 ## Tableau Public
 
-**Tableau Public dashboard:**  
-`Coming soon`
+**Interactive Dashboards:** [View Olist E-commerce Analytics on Tableau Public](https://public.tableau.com/views/OlistE-commerceAnalyticsBusinessPerformanceCustomerRetention/OlistSellersProductsPerformanceAnalysis)
 
-This section will be updated after the workbook is published.
 
 ---
 
