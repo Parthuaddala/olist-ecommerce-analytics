@@ -1,0 +1,29 @@
+
+# Original Olist datasets
+data/raw/
+
+# Large intermediate geolocation file
+data/cleaned/geolocation_clean.csv
+
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# Python temporary files
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Temporary files
+*.tmp
+*.bak
+
+# Tableau temporary and recovery files
+*.twbr
+*.twbr~
+.~*
+# Original exploratory notebook
+notebooks/01_data_inspection.ipynb
+
+# Exclude unpackaged Tableau workbooks
+tableau/*.twb
