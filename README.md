@@ -1,5 +1,10 @@
 # Olist E-commerce Analytics
 
+**[View Interactive Tableau Dashboards](https://public.tableau.com/views/OlistE-commerceAnalyticsBusinessPerformanceCustomerRetention/OlistSellersProductsPerformanceAnalysis)** | **[GitHub Repository](https://github.com/Parthuaddala/olist-ecommerce-analytics)**
+
+---
+
+
 ## Project Overview
 
 This project is an end-to-end e-commerce analytics case study built using **Python (pandas)**, **MySQL**, and **Tableau**.
@@ -497,12 +502,8 @@ olist-ecommerce-analytics/
 5. Export the nine final queries from `sql/06_tableau_datasets.sql` to `data/tableau_exports/`, using the CSV names shown above.
 6. Open `tableau/Olist_Ecommerce_Analytics.twbx` to explore the packaged Tableau dashboards. The packaged workbook may already contain supporting data, so a MySQL setup is not needed just to view it.
 
----
 
 
-## Tableau Public
-
-**Interactive Dashboards:** [View Olist E-commerce Analytics on Tableau Public](https://public.tableau.com/views/OlistE-commerceAnalyticsBusinessPerformanceCustomerRetention/OlistSellersProductsPerformanceAnalysis)
 
 
 ---
