@@ -94,7 +94,7 @@ Key source tables include:
 - product category translation
 - geolocation
 
-The analysis focuses primarily on **delivered orders** for completed-sales and fulfillment reporting.
+The analysis focuses primarily on **delivered orders** for completed-sales and fulfillment reporting. All monetary values are denominated in **Brazilian reais (BRL, R$)**, not US dollars.
 
 ---
 
@@ -252,8 +252,8 @@ Includes:
 **Headline metrics**
 
 - **96,211 delivered orders**
-- **$15.38M total payment value**
-- **$159.81 average order value**
+- **R$15.38M total payment value (BRL)**
+- **R$159.81 average order value (BRL)**
 - **1.14 average items per order**
 
 ---
@@ -360,13 +360,9 @@ Approximately **97% of customers** placed only one delivered order.
 
 Because frequency is so heavily concentrated, RFM frequency scoring has limited separation compared with a more repeat-heavy business. This is why RFM is treated as supporting analysis rather than the only customer-segmentation method.
 
-### 3. Customer spend is concentrated
+### 3. Customer spending varies across the customer base
 
-The Pareto-style spend analysis shows that a smaller share of customers contributes a disproportionately large share of total spend.
-
-For example, roughly **52% of customers account for about 82% of customer spend**.
-
-This suggests that high-value customer identification can be useful even though repeat purchasing is limited.
+The cumulative customer-spend chart illustrates how spending is distributed, helping identify higher-value customer groups. In the observed distribution, roughly **52% of customers account for 82% of spending**. This is a descriptive result rather than evidence of an unusually high concentration; a top-10% or top-20% share would make the comparison more informative.
 
 ### 4. Cohort retention is very low after the first purchase month
 
@@ -374,11 +370,9 @@ Month 0 begins at 100% by definition, but later monthly retention rates are gene
 
 This reinforces the finding that the marketplace is driven primarily by one-time buyers rather than frequent returning customers.
 
-### 5. Delivery performance affects customer experience
+### 5. Delivery delays are associated with customer reviews
 
-The delivery analysis connects delivery timeliness with customer review behavior.
-
-Late-delivery severity and review-score analysis help identify where operational issues may be contributing to weaker customer satisfaction.
+The delivery analysis compares delivery timeliness with customer review behavior. Lower average review scores among later deliveries indicate an association worth investigating, but this observational analysis does not establish that a delivery intervention would cause a specific improvement in ratings.
 
 ### 6. Seller performance varies across delivery and satisfaction dimensions
 
@@ -390,6 +384,17 @@ This makes it possible to distinguish between:
 - sellers with delivery problems
 - sellers with customer-satisfaction problems
 - sellers with both issues
+
+---
+
+## Business Recommendations
+
+These are suggested next steps based on the descriptive findings, not measured effects of interventions:
+
+1. **Test second-purchase retention campaigns.** With only about 3% of customers placing multiple delivered orders, pilot post-purchase messaging or targeted incentives and track second-purchase conversion against a comparison group.
+2. **Prioritize delivery improvement by both rate and volume.** Investigate states with high late-delivery rates and sufficient order volumes, then monitor late rates, days late, and review scores over time.
+3. **Use seller risk segments for targeted support.** Review high-risk sellers and distinguish delivery issues from satisfaction issues; compare performance before and after operational changes.
+4. **Monitor monthly acquisition cohorts and customer value.** Track post-acquisition repeat activity alongside spend to identify segments worth testing for retention outreach. Do not interpret month-0 retention (100% by definition) as evidence of loyalty.
 
 ---
 
@@ -466,7 +471,7 @@ olist-ecommerce-analytics/
 │   ├── 05_advanced_sql_analysis.sql
 │   └── 06_tableau_datasets.sql
 ├── data/
-│   ├── raw/
+│   ├── raw/  (local only; excluded from GitHub)
 │   ├── cleaned/
 │   └── tableau_exports/
 │       ├── seller_risk_matrix.csv
@@ -489,7 +494,7 @@ olist-ecommerce-analytics/
         └── seller_risk_interaction.gif
 ```
 
-> The tree shows the intended local project layout. Before publishing, check large files and keep only the datasets you intend to share. The original raw Olist files may instead be downloaded from the dataset source.
+The repository excludes the original raw Olist downloads; source files can be obtained separately. The packaged Tableau workbook includes the data needed to explore the published dashboards.
 
 ---
 
@@ -497,14 +502,10 @@ olist-ecommerce-analytics/
 
 1. Obtain the original Olist e-commerce dataset and place the source CSVs in `data/raw/`.
 2. Run `notebooks/01_data_preparation.ipynb` to generate the expected files in `data/cleaned/` (or use the supplied cleaned files if included).
-3. Configure `LOAD DATA LOCAL INFILE` for your MySQL 8+ installation and replace the **placeholder root path** in `sql/01_database_setup.sql` with your actual local project directory. Merely naming the project folder `olist-ecommerce-analytics` does not make `/YOUR/LOCAL/PATH/` a working path.
+3. Configure `LOAD DATA LOCAL INFILE` for your MySQL 8+ installation. Replace `/YOUR/LOCAL/PATH/` in `sql/01_database_setup.sql` with the absolute location of the project on your machine.
 4. Run the SQL scripts in numeric order. `02_data_validation.sql` checks the loaded tables; review its results before proceeding.
 5. Export the nine final queries from `sql/06_tableau_datasets.sql` to `data/tableau_exports/`, using the CSV names shown above.
 6. Open `tableau/Olist_Ecommerce_Analytics.twbx` to explore the packaged Tableau dashboards. The packaged workbook may already contain supporting data, so a MySQL setup is not needed just to view it.
-
-
-
-
 
 ---
 
