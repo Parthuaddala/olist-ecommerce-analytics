@@ -1,6 +1,9 @@
 # Olist E-commerce Analytics
 
-**[View Interactive Tableau Dashboards](https://public.tableau.com/views/OlistE-commerceAnalyticsBusinessPerformanceCustomerRetention/OlistSellersProductsPerformanceAnalysis)** | **[GitHub Repository](https://github.com/Parthuaddala/olist-ecommerce-analytics)**
+
+---
+
+**[View Interactive Tableau Dashboards](https://public.tableau.com/views/Olist_Ecommerce_Analytics_17922884157270/Overview-MonthlyOrdersPaymentTrend)** | **[GitHub Repository](https://github.com/Parthuaddala/olist-ecommerce-analytics)**
 
 ---
 
