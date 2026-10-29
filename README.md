@@ -131,10 +131,10 @@ olist-ecommerce-analytics/
 └── tableau/
     ├── Olist_Ecommerce_Analytics.twbx
     └── screenshots/
-        ├── Overview Dashboard.gif
-        ├── Delivery Dashboard.gif
-        ├── Seller Dashboard.gif
-        └── Customer Dashboard.gif
+        ├── 01_overview.gif
+        ├── 02_delivery_performance.gif
+        ├── 03_sellers_products.gif
+        └── 04_customer_retention.gif
 ```
 
 ### 🗃️ SQL guide
