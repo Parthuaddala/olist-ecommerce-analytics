@@ -1,29 +1,14 @@
--- ============================================================================
--- OLIST E-COMMERCE ANALYTICS PROJECT
--- File: 01_database_setup.sql
--- Purpose: Create the database schema, constraints, indexes, and load cleaned data
--- MySQL 8+
---
--- NOTE:
--- Update the file paths below to match the location of the cloned project
--- on your local machine before running the LOAD DATA LOCAL INFILE statements.
--- Example project root: /YOUR/LOCAL/PATH/olist-ecommerce-analytics
--- The script is intended for a fresh database build; do not rerun it against an
--- existing populated schema unless you intentionally reset the database first.
--- ============================================================================
+-- Olist E-Commerce Analytics | Database Setup
+-- Update /YOUR/LOCAL/PATH/ before loading files; run on a fresh schema.
+
 
 CREATE DATABASE IF NOT EXISTS olist_ecommerce;
 USE olist_ecommerce;
 
--- Enable LOCAL INFILE if your MySQL installation requires it.
--- This may require administrative privileges.
 SET GLOBAL local_infile = 1;
 
 
--- ============================================================================
--- TABLE 1: GEOLOCATION
--- Grain: One row per ZIP-code prefix
--- ============================================================================
+-- 01. Geolocation
 
 CREATE TABLE geolocation (
     geolocation_zip_code_prefix CHAR(5) PRIMARY KEY,
@@ -56,10 +41,7 @@ IGNORE 1 ROWS
 );
 
 
--- ============================================================================
--- TABLE 2: CATEGORY TRANSLATION
--- Grain: One row per Portuguese product category
--- ============================================================================
+-- 02. Category Translation
 
 CREATE TABLE category_translation (
     product_category_name VARCHAR(100) PRIMARY KEY,
@@ -80,11 +62,8 @@ IGNORE 1 ROWS
 );
 
 
--- ============================================================================
--- TABLE 3: CUSTOMERS
--- Grain: One row per customer_id
--- customer_unique_id is used later to identify the same shopper across orders.
--- ============================================================================
+-- 03. Customers
+-- customer_unique_id identifies shoppers across orders.
 
 CREATE TABLE customers (
     customer_id CHAR(32) PRIMARY KEY,
@@ -120,10 +99,7 @@ IGNORE 1 ROWS
 );
 
 
--- ============================================================================
--- TABLE 4: PRODUCTS
--- Grain: One row per product_id
--- ============================================================================
+-- 04. Products
 
 CREATE TABLE products (
     product_id CHAR(32) PRIMARY KEY,
@@ -170,10 +146,7 @@ SET
         NULLIF(TRIM(TRAILING '\r' FROM @product_width_cm), '');
 
 
--- ============================================================================
--- TABLE 5: SELLERS
--- Grain: One row per seller_id
--- ============================================================================
+-- 05. Sellers
 
 CREATE TABLE sellers (
     seller_id CHAR(32) PRIMARY KEY,
@@ -204,10 +177,7 @@ IGNORE 1 ROWS
 );
 
 
--- ============================================================================
--- TABLE 6: ORDERS
--- Grain: One row per order_id
--- ============================================================================
+-- 06. Orders
 
 CREATE TABLE orders (
     order_id CHAR(32) PRIMARY KEY,
@@ -264,10 +234,7 @@ SET
         NULLIF(TRIM(TRAILING '\r' FROM @order_estimated_delivery_date), '');
 
 
--- ============================================================================
--- TABLE 7: ORDER ITEMS
--- Grain: One row per (order_id, order_item_id)
--- ============================================================================
+-- 07. Order Items
 
 CREATE TABLE order_items (
     order_id CHAR(32) NOT NULL,
@@ -328,10 +295,7 @@ SET
         NULLIF(TRIM(TRAILING '\r' FROM @freight_value), '');
 
 
--- ============================================================================
--- TABLE 8: PAYMENTS
--- Grain: One row per (order_id, payment_sequential)
--- ============================================================================
+-- 08. Payments
 
 CREATE TABLE payments (
     order_id CHAR(32) NOT NULL,
@@ -373,11 +337,7 @@ SET
         NULLIF(TRIM(TRAILING '\r' FROM @payment_value), '');
 
 
--- ============================================================================
--- TABLE 9: REVIEWS
--- Grain: One row per (review_id, order_id)
--- review_answer_timestamp is nullable because some source records have no value.
--- ============================================================================
+-- 09. Reviews
 
 CREATE TABLE reviews (
     review_id CHAR(32) NOT NULL,
@@ -432,10 +392,8 @@ SET
         NULLIF(TRIM(TRAILING '\r' FROM @review_answer_timestamp), '');
 
 
--- ============================================================================
--- MINIMAL LOAD SANITY CHECK
--- Detailed validation is performed in 02_data_validation.sql.
--- ============================================================================
+-- 10. Load Check
+-- Detailed checks are in 02_data_validation.sql.
 
 SELECT 'geolocation' AS table_name, COUNT(*) AS row_count FROM geolocation
 UNION ALL

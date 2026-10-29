@@ -1,17 +1,10 @@
--- ============================================================================
--- OLIST E-COMMERCE ANALYTICS PROJECT
--- File: 02_data_validation.sql
--- Purpose: Validate row counts, keys, relationships, ranges, dates, coverage,
---          indexes, and constraints after loading the cleaned datasets
--- ============================================================================
+-- Olist E-Commerce Analytics | Data Validation
+
 
 USE olist_ecommerce;
 
 
--- ============================================================================
--- SECTION 1A: TABLE ROW COUNTS
--- Purpose: Confirm that every cleaned dataset loaded completely
--- ============================================================================
+-- 01. Table Row Counts
 
 SELECT 'geolocation' AS table_name, COUNT(*) AS row_count
 FROM geolocation
@@ -49,10 +42,7 @@ SELECT 'reviews', COUNT(*)
 FROM reviews;
 
 
--- ============================================================================
--- SECTION 1B: ACTUAL VS EXPECTED ROW COUNTS
--- Purpose: Automatically flag row-count mismatches
--- ============================================================================
+-- 02. Expected Row Counts
 
 WITH actual_counts AS (
     SELECT 'geolocation' AS table_name, COUNT(*) AS actual_rows
@@ -118,10 +108,7 @@ JOIN expected_counts AS e
 ORDER BY a.table_name;
 
 
--- ============================================================================
--- SECTION 2A: SINGLE-COLUMN PRIMARY KEY UNIQUENESS
--- Purpose: Confirm that single-column primary keys contain no duplicates
--- ============================================================================
+-- 03. Primary Key Uniqueness
 
 SELECT
     'geolocation' AS table_name,
@@ -171,10 +158,7 @@ SELECT
 FROM orders;
 
 
--- ============================================================================
--- SECTION 2B: COMPOSITE KEY UNIQUENESS
--- Purpose: Confirm that multi-column primary keys contain no duplicates
--- ============================================================================
+-- 04. Composite Key Uniqueness
 
 SELECT
     'order_items' AS table_name,
@@ -221,10 +205,7 @@ FROM (
 ) AS review_duplicates;
 
 
--- ============================================================================
--- SECTION 3A: FOREIGN-KEY RELATIONSHIP VALIDATION
--- Purpose: Confirm that child-table IDs match parent-table IDs
--- ============================================================================
+-- 05. Foreign Key Relationships
 
 SELECT
     'orders.customer_id -> customers.customer_id' AS relationship_name,
@@ -280,11 +261,8 @@ LEFT JOIN orders AS o
 WHERE o.order_id IS NULL;
 
 
--- ============================================================================
--- SECTION 3B: PARENT RECORDS WITHOUT CHILD RECORDS
--- Purpose: Document optional relationship gaps
--- Known findings: 775 orders without items, 1 without payment, 768 without reviews
--- ============================================================================
+-- 06. Missing Child Records
+-- Missing item, payment, or review records may be legitimate.
 
 SELECT
     'orders_without_items' AS validation_check,
@@ -313,10 +291,7 @@ LEFT JOIN reviews AS r
 WHERE r.order_id IS NULL;
 
 
--- ============================================================================
--- SECTION 4A: MISSING VALUE CHECKS
--- Purpose: Profile important nullable columns
--- ============================================================================
+-- 07. Missing Values
 
 SELECT
     'products' AS table_name,
@@ -345,10 +320,7 @@ SELECT
 FROM reviews;
 
 
--- ============================================================================
--- SECTION 4B: VALID RANGE CHECKS
--- Purpose: Detect impossible or invalid numeric values
--- ============================================================================
+-- 08. Numeric Range Checks
 
 SELECT
     SUM(price <= 0) AS invalid_prices,
@@ -373,10 +345,7 @@ SELECT
 FROM products;
 
 
--- ============================================================================
--- SECTION 4C: DATE-SEQUENCE CHECKS
--- Purpose: Detect logically inconsistent event dates
--- ============================================================================
+-- 09. Date Sequence Checks
 
 SELECT
     SUM(order_approved_at < order_purchase_timestamp)
@@ -390,10 +359,7 @@ SELECT
 FROM orders;
 
 
--- ============================================================================
--- SECTION 4D: DELIVERED ORDERS WITH MISSING ACTUAL DELIVERY DATE
--- Purpose: Identify delivered-status records that cannot be used in timeliness rates
--- ============================================================================
+-- 10. Missing Delivery Dates
 
 SELECT
     COUNT(*) AS delivered_orders_missing_actual_delivery_date
@@ -402,11 +368,8 @@ WHERE order_status = 'delivered'
   AND order_delivered_customer_date IS NULL;
 
 
--- ============================================================================
--- SECTION 5A: CATEGORY TRANSLATION COVERAGE
--- Purpose: Identify categories without an English translation
--- Note: The 'unknown' product category is expected to have no translation row.
--- ============================================================================
+-- 11. Category Translation Coverage
+-- The unknown category may have no English translation.
 
 SELECT DISTINCT
     p.product_category_name
@@ -430,10 +393,7 @@ SELECT
 FROM category_translation;
 
 
--- ============================================================================
--- SECTION 5B: CUSTOMER GEOLOCATION COVERAGE
--- Purpose: Count customers whose ZIP prefix has no map coordinate
--- ============================================================================
+-- 12. Customer Geolocation Coverage
 
 SELECT
     COUNT(*) AS customers_without_geolocation
@@ -443,10 +403,7 @@ LEFT JOIN geolocation AS g
 WHERE g.geolocation_zip_code_prefix IS NULL;
 
 
--- ============================================================================
--- SECTION 5C: SELLER GEOLOCATION COVERAGE
--- Purpose: Count sellers whose ZIP prefix has no map coordinate
--- ============================================================================
+-- 13. Seller Geolocation Coverage
 
 SELECT
     COUNT(*) AS sellers_without_geolocation
@@ -456,11 +413,8 @@ LEFT JOIN geolocation AS g
 WHERE g.geolocation_zip_code_prefix IS NULL;
 
 
--- ============================================================================
--- SECTION 5D: GEOGRAPHIC COORDINATE RANGE CHECK
--- Purpose: Identify coordinates outside approximate Brazil bounds
--- Note: A small number of outliers are retained rather than deleted.
--- ============================================================================
+-- 14. Coordinate Outliers
+-- Outliers are reported, not removed.
 
 SELECT
     COUNT(*) AS geographic_outliers
@@ -481,10 +435,7 @@ WHERE geolocation_lat NOT BETWEEN -35 AND 6
 ORDER BY geolocation_zip_code_prefix;
 
 
--- ============================================================================
--- SECTION 6A: INDEX AUDIT
--- Purpose: Confirm that primary-key and analytical indexes exist
--- ============================================================================
+-- 15. Index Audit
 
 SELECT
     table_name,
@@ -500,10 +451,7 @@ ORDER BY
     seq_in_index;
 
 
--- ============================================================================
--- SECTION 6B: FOREIGN-KEY CONSTRAINT AUDIT
--- Purpose: Confirm that database relationships are enforced
--- ============================================================================
+-- 16. Foreign Key Audit
 
 SELECT
     table_name,
@@ -519,10 +467,7 @@ ORDER BY
     constraint_name;
 
 
--- ============================================================================
--- SECTION 6C: OVERALL CONSTRAINT AUDIT
--- Purpose: Review primary-key, unique, and foreign-key constraints
--- ============================================================================
+-- 17. Constraint Audit
 
 SELECT
     table_name,

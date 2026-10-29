@@ -1,18 +1,8 @@
--- ============================================================================
--- OLIST E-COMMERCE ANALYTICS PROJECT
--- File: 03_analysis_views.sql
--- Purpose: Create reusable analytical views at clearly defined grains
--- ============================================================================
-
+-- Olist E-Commerce Analytics | Reusable MySQL views
 USE olist_ecommerce;
 
 
--- -------------------------------------------------------------------------
--- VIEW 1: ORDER ITEM DETAILS
--- Grain: One row per order item
--- Purpose: Combine item, order, customer, product, category, and seller data
--- -------------------------------------------------------------------------
-
+-- 01. Order Item Details | One row per order item
 CREATE OR REPLACE VIEW vw_order_item_details AS
 
 SELECT
@@ -72,12 +62,8 @@ INNER JOIN sellers AS s
     ON oi.seller_id = s.seller_id;
 
 
--- -------------------------------------------------------------------------
--- VIEW 2: ORDER FINANCIALS
--- Grain: One row per order
--- Purpose: Summarize item and payment financials without row multiplication
--- -------------------------------------------------------------------------
-
+-- 02. Order Financials | One row per order
+-- Summarizes items and payments separately to avoid double counting.
 CREATE OR REPLACE VIEW vw_order_financials AS
 
 WITH item_summary AS (
@@ -125,15 +111,8 @@ LEFT JOIN payment_summary AS p
     ON o.order_id = p.order_id;
 
 
--- -------------------------------------------------------------------------
--- VIEW 3: ORDER DELIVERY PERFORMANCE
--- Grain: One row per order
--- Purpose: Measure order processing and delivery performance
--- Note: delivery_days/estimated_delivery_days use full 24-hour intervals via
---       TIMESTAMPDIFF, while delivery_variance_days uses calendar-day difference
---       via DATEDIFF to classify delivery against the promised date.
--- -------------------------------------------------------------------------
-
+-- 03. Delivery Performance | One row per order
+-- Delivery duration uses full days; lateness uses calendar dates.
 CREATE OR REPLACE VIEW vw_order_delivery_performance AS
 
 SELECT
@@ -189,12 +168,7 @@ SELECT
 FROM orders AS o;
 
 
--- -------------------------------------------------------------------------
--- VIEW 4: ORDER REVIEW SUMMARY
--- Grain: One row per order
--- Purpose: Summarize review activity without duplicating orders
--- -------------------------------------------------------------------------
-
+-- 04. Review Summary | One row per order
 CREATE OR REPLACE VIEW vw_order_review_summary AS
 
 WITH review_summary AS (
@@ -243,14 +217,8 @@ LEFT JOIN review_summary AS rs
     ON o.order_id = rs.order_id;
 
 
--- -------------------------------------------------------------------------
--- VIEW 5: CUSTOMER LIFETIME SUMMARY
--- Grain: One row per customer_unique_id
--- Purpose: Summarize customer purchasing behavior as of the 2018-09-01 snapshot
--- Snapshot Date: 2018-09-01
--- Note: Only delivered purchases before the snapshot date are included.
--- -------------------------------------------------------------------------
-
+-- 05. Customer Lifetime Summary | One row per customer
+-- Delivered purchases through August 2018.
 CREATE OR REPLACE VIEW vw_customer_lifetime_summary AS
 
 WITH customer_orders AS (
@@ -296,14 +264,8 @@ FROM customer_orders
 GROUP BY customer_unique_id;
 
 
--- -------------------------------------------------------------------------
--- VIEW 6: SELLER LIFETIME SUMMARY
--- Grain: One row per seller_id
--- Purpose: Summarize delivered seller activity, sales, product mix, and geography
--- Note: Metrics are delivered-order lifetime totals across the full dataset and do
---       not dynamically recalculate for a filtered time period.
--- -------------------------------------------------------------------------
-
+-- 06. Seller Lifetime Summary | One row per seller
+-- Uses all delivered orders; not limited to the reporting period.
 CREATE OR REPLACE VIEW vw_seller_lifetime_summary AS
 
 WITH seller_metrics AS (
@@ -349,3 +311,108 @@ FROM sellers AS s
 
 LEFT JOIN seller_metrics AS sm
     ON s.seller_id = sm.seller_id;
+
+
+
+
+
+
+
+USE olist_ecommerce;
+
+-- 07. First Delivery & 90-Day Repeat | One row per customer
+-- Requires 90-day follow-up; results show association, not causation.
+CREATE OR REPLACE VIEW
+vw_first_delivery_repeat_90d AS
+
+WITH ranked_orders AS (
+    SELECT
+        c.customer_unique_id,
+        o.order_id,
+        o.order_purchase_timestamp,
+        o.order_delivered_customer_date,
+        o.order_estimated_delivery_date,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY c.customer_unique_id
+            ORDER BY
+                o.order_purchase_timestamp,
+                o.order_id
+        ) AS order_rank
+
+    FROM orders AS o
+
+    INNER JOIN customers AS c
+        ON o.customer_id = c.customer_id
+
+    WHERE o.order_status = 'delivered'
+      AND o.order_purchase_timestamp < '2018-09-01'
+),
+
+first_orders AS (
+    SELECT
+        customer_unique_id,
+        order_id AS first_order_id,
+        order_purchase_timestamp AS first_purchase_date,
+        order_delivered_customer_date AS first_delivery_date,
+
+        DATE_FORMAT(
+            order_purchase_timestamp,
+            '%Y-%m'
+        ) AS first_purchase_month,
+
+        CASE
+            WHEN DATEDIFF(
+                order_delivered_customer_date,
+                order_estimated_delivery_date
+            ) > 0 THEN 'Late'
+            ELSE 'On Time / Early'
+        END AS first_delivery_status
+
+    FROM ranked_orders
+
+    WHERE order_rank = 1
+      AND order_purchase_timestamp >= '2017-01-01'
+      AND order_delivered_customer_date IS NOT NULL
+      AND order_estimated_delivery_date IS NOT NULL
+      AND order_delivered_customer_date >=
+          order_purchase_timestamp
+      AND order_delivered_customer_date <=
+          DATE_SUB('2018-09-01', INTERVAL 90 DAY)
+)
+
+SELECT
+    f.customer_unique_id,
+    f.first_order_id,
+    f.first_purchase_date,
+    f.first_delivery_date,
+    f.first_purchase_month,
+    f.first_delivery_status,
+
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM orders AS o2
+
+            INNER JOIN customers AS c2
+                ON o2.customer_id = c2.customer_id
+
+            WHERE c2.customer_unique_id =
+                  f.customer_unique_id
+              AND o2.order_id <> f.first_order_id
+              AND o2.order_status = 'delivered'
+              AND o2.order_purchase_timestamp >
+                  f.first_delivery_date
+              AND o2.order_purchase_timestamp <=
+                  DATE_ADD(
+                      f.first_delivery_date,
+                      INTERVAL 90 DAY
+                  )
+              AND o2.order_purchase_timestamp <
+                  '2018-09-01'
+        )
+        THEN 1
+        ELSE 0
+    END AS repeated_within_90_days
+
+FROM first_orders AS f;

@@ -1,20 +1,11 @@
--- ============================================================================
--- OLIST E-COMMERCE ANALYTICS PROJECT
--- File: 04_business_analysis.sql
--- Purpose: Answer core business questions using the reusable analytical views
--- Metric note: product_value represents merchandise value from item price, while
--- payment_value/payment_total represents customer payment value at order level.
--- ============================================================================
+-- Olist E-Commerce Analytics | Business Analysis
+-- Product value excludes freight; payment value reflects order payments.
+
 
 USE olist_ecommerce;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 1: OVERALL ORDER AND FINANCIAL KPIs
--- Purpose: Establish a high-level baseline across all order statuses
--- Source View: vw_order_financials
--- Grain of Source: One row per order
--- -------------------------------------------------------------------------
+-- 01. Order & Financial KPIs
 
 SELECT
     COUNT(*) AS total_orders,
@@ -27,12 +18,7 @@ SELECT
 FROM vw_order_financials;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 2: ORDER STATUS BREAKDOWN
--- Purpose: Understand the distribution of orders across fulfillment statuses
--- Source View: vw_order_financials
--- Grain of Output: One row per order status
--- -------------------------------------------------------------------------
+-- 02. Order Status Breakdown
 
 SELECT
     order_status,
@@ -46,13 +32,7 @@ GROUP BY order_status
 ORDER BY order_count DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 3: DELIVERED ORDER KPIs
--- Purpose: Measure completed sales performance using delivered orders only
--- Source View: vw_order_financials
--- Grain of Source: One row per order
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 03. Delivered Order KPIs
 
 SELECT
     COUNT(*) AS delivered_orders,
@@ -68,13 +48,7 @@ WHERE order_status = 'delivered'
   AND order_purchase_timestamp < '2018-09-01';
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 4: MONTHLY ORDER AND SALES TRENDS
--- Purpose: Track completed order volume and sales value over time
--- Source View: vw_order_financials
--- Grain of Output: One row per month
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 04. Monthly Order Trends
 
 SELECT
     DATE_FORMAT(order_purchase_timestamp, '%Y-%m') AS order_month,
@@ -90,13 +64,7 @@ GROUP BY DATE_FORMAT(order_purchase_timestamp, '%Y-%m')
 ORDER BY order_month;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 5: PRODUCT CATEGORY PERFORMANCE
--- Purpose: Compare delivered product categories by demand and sales value
--- Source View: vw_order_item_details
--- Grain of Output: One row per product category
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 05. Product Category Performance
 
 SELECT
     product_category_name_english AS product_category,
@@ -114,13 +82,7 @@ GROUP BY product_category_name_english
 ORDER BY product_value DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 6: CATEGORY SALES SHARE
--- Purpose: Measure each product category's contribution to delivered product value
--- Source View: vw_order_item_details
--- Grain of Output: One row per product category
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 06. Category Sales Share
 
 WITH category_sales AS (
     SELECT
@@ -144,13 +106,7 @@ FROM category_sales
 ORDER BY product_value DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 7: TOP SELLERS BY PRODUCT VALUE
--- Purpose: Identify the highest-value sellers based on delivered merchandise sales
--- Source View: vw_order_item_details
--- Grain of Output: One row per seller
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 07. Top Sellers
 
 SELECT
     seller_id,
@@ -173,13 +129,7 @@ ORDER BY product_value DESC
 LIMIT 20;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 8: CUSTOMER STATE PERFORMANCE
--- Purpose: Compare delivered order activity and product value by customer state
--- Source View: vw_order_item_details
--- Grain of Output: One row per customer state
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 08. Customer State Performance
 
 SELECT
     customer_state,
@@ -196,13 +146,7 @@ GROUP BY customer_state
 ORDER BY product_value DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 9: CUSTOMER STATE SALES SHARE
--- Purpose: Measure each customer state's contribution to delivered product value
--- Source View: vw_order_item_details
--- Grain of Output: One row per customer state
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 09. Customer State Sales Share
 
 WITH state_sales AS (
     SELECT
@@ -226,13 +170,7 @@ FROM state_sales
 ORDER BY product_value DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 10: DELIVERY PERFORMANCE SUMMARY
--- Purpose: Measure overall delivery speed and on-time performance
--- Source View: vw_order_delivery_performance
--- Grain of Source: One row per order
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 10. Delivery Summary
 
 SELECT
     COUNT(*) AS delivered_orders,
@@ -272,13 +210,7 @@ WHERE order_status = 'delivered'
   AND order_purchase_timestamp < '2018-09-01';
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 11: DELIVERY PERFORMANCE BY CUSTOMER STATE
--- Purpose: Compare delivery speed and late-delivery rates across customer states
--- Source Views: vw_order_delivery_performance + customers
--- Grain of Output: One row per customer state
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 11. Delivery by State
 
 SELECT
     c.customer_state,
@@ -318,12 +250,7 @@ GROUP BY c.customer_state
 ORDER BY late_delivery_rate_pct DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 12: REVIEW SCORE SUMMARY
--- Purpose: Understand overall customer review patterns for reviewed orders
--- Source View: vw_order_review_summary
--- Grain of Source: One row per order
--- -------------------------------------------------------------------------
+-- 12. Review Score Summary
 
 SELECT
     COUNT(*) AS reviewed_orders,
@@ -358,14 +285,7 @@ FROM vw_order_review_summary
 WHERE has_review = 1;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 13: REVIEW SCORE BY DELIVERY PERFORMANCE
--- Purpose: Compare customer review scores for on-time versus late deliveries
--- Source Views: vw_order_review_summary + vw_order_delivery_performance
--- Grain of Output: One row per delivery status
--- Note: Excludes delivered-status orders with missing actual delivery dates.
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 13. Reviews by Delivery Status
 
 SELECT
     d.delivery_status,
@@ -408,12 +328,7 @@ GROUP BY d.delivery_status
 ORDER BY avg_review_score DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 14: REPEAT CUSTOMER SUMMARY
--- Purpose: Compare one-time and repeat customers at the customer level
--- Source View: vw_customer_lifetime_summary
--- Grain of Output: One row per repeat-customer flag
--- -------------------------------------------------------------------------
+-- 14. Repeat Customers
 
 SELECT
     repeat_customer_flag,
@@ -435,12 +350,7 @@ GROUP BY repeat_customer_flag
 ORDER BY repeat_customer_flag;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 15: CUSTOMER RECENCY AND FREQUENCY SUMMARY
--- Purpose: Understand how recently customers purchased and how often they returned
--- Source View: vw_customer_lifetime_summary
--- Grain of Output: One row per recency band
--- -------------------------------------------------------------------------
+-- 15. Customer Recency & Frequency
 
 SELECT
     CASE
@@ -475,13 +385,8 @@ GROUP BY
 ORDER BY MIN(recency_days);
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 16: PAYMENT METHOD MIX
--- Purpose: Understand how customers pay for delivered orders
--- Source Tables: payments + orders
--- Grain of Output: One row per payment type
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 16. Payment Method Mix
+-- One order may use multiple payment methods.
 
 SELECT
     p.payment_type,
@@ -505,13 +410,7 @@ GROUP BY p.payment_type
 ORDER BY total_payment_value DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 17: FREIGHT BURDEN BY CUSTOMER STATE
--- Purpose: Compare shipping cost relative to merchandise value across states
--- Source View: vw_order_item_details
--- Grain of Output: One row per customer state
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 17. Freight Burden by State
 
 SELECT
     customer_state,
@@ -535,13 +434,7 @@ GROUP BY customer_state
 ORDER BY freight_to_product_pct DESC;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 18: LATE DELIVERY SEVERITY
--- Purpose: Measure how many days late delayed orders are
--- Source View: vw_order_delivery_performance
--- Grain of Source: One row per order
--- Analysis Period: January 2017 through August 2018
--- -------------------------------------------------------------------------
+-- 18. Late Delivery Severity
 
 SELECT
     COUNT(*) AS late_orders,
@@ -558,12 +451,7 @@ WHERE order_status = 'delivered'
   AND order_delivered_customer_date IS NOT NULL;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 19: REVIEW SCORE DISTRIBUTION
--- Purpose: Show how individual review records are distributed across scores
--- Source Table: reviews
--- Grain of Output: One row per review score
--- -------------------------------------------------------------------------
+-- 19. Review Score Distribution
 
 SELECT
     review_score,
@@ -581,12 +469,7 @@ GROUP BY review_score
 ORDER BY review_score;
 
 
--- -------------------------------------------------------------------------
--- BUSINESS ANALYSIS 20: CUSTOMER SPEND BAND DISTRIBUTION
--- Purpose: Segment customers into payment-value bands
--- Source View: vw_customer_lifetime_summary
--- Grain of Output: One row per spend band
--- -------------------------------------------------------------------------
+-- 20. Customer Spend Bands
 
 SELECT
     CASE

@@ -1,470 +1,112 @@
-# Olist E-commerce Analytics
+# 🛒 Olist E-Commerce Analytics
 
+**Python · MySQL 8+ · Tableau Public | End-to-end marketplace analytics**
 
----
+An interactive analysis of Brazilian Olist marketplace orders, delivery operations, sellers, product categories, and customer retention. The project combines data preparation, reusable SQL views, validated metrics, and four Tableau dashboards.
 
-**[View Interactive Tableau Dashboards](https://public.tableau.com/views/Olist_Ecommerce_Analytics_17922884157270/Overview-MonthlyOrdersPaymentTrend)** | **[GitHub Repository](https://github.com/Parthuaddala/olist-ecommerce-analytics)**
+**[▶ View the interactive Tableau dashboards](https://public.tableau.com/views/OlistE-CommerceAnalyticsOrdersDeliverySellersCustomers/OlistE-commercePerformanceOverview)** · **[📁 GitHub repository](https://github.com/Parthuaddala/olist-ecommerce-analytics)**
 
----
-
-
-## Project Overview
-
-This project is an end-to-end e-commerce analytics case study built using **Python (pandas)**, **MySQL**, and **Tableau**.
-
-The goal was to move beyond basic reporting and build a structured analytics workflow that answers business questions across four areas:
-
-- overall marketplace performance
-- delivery and fulfillment performance
-- seller and product performance
-- customer behavior and retention
-
-The analysis uses the Brazilian Olist e-commerce dataset and follows a full workflow from database setup and validation to reusable SQL views, business analysis, advanced customer analytics, and Tableau dashboards.
+**Period:** January 2017–August 2018 (2018 partial) · **Currency:** Brazilian real (R$) · **Scope:** Primarily delivered orders
 
 ---
 
-## Business Questions
+## 📊 Performance at a glance
 
-The project was designed to answer questions such as:
+| Measure | Result |
+|---|---:|
+| Delivered orders | **96,211** |
+| Total payment value | **R$15.38M** |
+| Average order value | **R$159.81** |
+| Valid delivery records | **96,203** |
+| Late delivery rate | **6.79%** |
+| Customers in latest cumulative snapshot | **93,293** |
+| Repeat customer rate | **3.00%** |
 
-- How many delivered orders were completed and how much payment value did they generate?
-- How did order volume and payment value change over time?
-- Which customer states generated the most orders?
-- Which payment methods were used most often?
-- Which states experienced the highest late-delivery rates?
-- How severe were late deliveries?
-- How did delivery delays relate to customer review scores?
-- How much time was spent in seller dispatch versus carrier delivery?
-- Which sellers generated the most product value?
-- Which sellers showed delivery or customer-satisfaction risk?
-- Which product categories performed best?
-- What percentage of customers purchased more than once?
-- How concentrated was customer spending?
-- Which customer groups were identified through RFM segmentation?
-- How well were customers retained after their first purchase?
+The delivery analysis excludes eight orders without customer delivery dates. Customer metrics use cumulative snapshots and are not restricted to the same population as the Overview dashboard.
 
 ---
 
-## Tools Used
+## 🖥️ Interactive dashboards
 
-- **Python / Jupyter Notebook**
-  - data inspection and cleaning
-  - missing-value handling and format normalization
-  - ZIP-prefix geolocation summarization
-  - preparing CSV and TSV inputs for MySQL
+The previews demonstrate the filters. Open the [published Tableau workbook](https://public.tableau.com/views/OlistE-CommerceAnalyticsOrdersDeliverySellersCustomers/OlistE-commercePerformanceOverview) to explore the tooltips and charts yourself.
 
-- **MySQL 8+**
-  - schema creation
-  - data loading
-  - data validation
-  - reusable analytical views
-  - joins
-  - CTEs
-  - CASE expressions
-  - window functions
-  - RFM segmentation
-  - cohort retention analysis
+### 📈 1. Marketplace overview
 
-- **Tableau Desktop Public Edition**
-  - KPI cards
-  - trend charts
-  - dual-axis charts
-  - seller risk matrix
-  - interactive filters
-  - Pareto analysis
-  - cohort retention heatmap
-  - dashboard actions
-  - calculated fields
-  - custom tooltips
+![Overview dashboard interactive preview](tableau/screenshots/01_overview.gif)
+
+**What it shows:** Delivered orders, payment value, average order value, monthly trends, customer-state performance, and payment methods. The **Report Year** control switches between All Years, 2017, and 2018.
+
+### 🚚 2. Delivery performance
+
+![Delivery dashboard interactive preview](tableau/screenshots/02_delivery_performance.gif)
+
+**What it shows:** Late-delivery rates by state, delay severity, review-score relationships, and fulfillment timing. Dispatch measures **approval → carrier handoff**; transit measures **carrier handoff → customer delivery**.
+
+### 🏪 3. Sellers & products
+
+![Seller dashboard interactive preview](tableau/screenshots/03_sellers_products.gif)
+
+**What it shows:** Seller risk segments, top sellers by product value, and top categories by reviewed-order product value. Filters include Report Year, Risk Segment, and Seller State. Seller risk eligibility requires **at least 30 delivered orders per period**.
+
+### 👥 4. Customer behavior & retention
+
+![Customer dashboard interactive preview](tableau/screenshots/04_customer_retention.gif)
+
+**What it shows:** Unique customers, repeat rate, average customer value, RFM segments, spend concentration, and monthly cohort retention. RFM metrics use historical snapshots, not independent calendar-year customer totals.
 
 ---
 
-## Dataset Scope
+## 💡 Key findings
 
-The reporting period used for the main dashboards is:
+| Insight | Evidence | Possible action |
+|---|---|---|
+| **Repeat buying is uncommon** | **3.00%** repeat customer rate in the latest snapshot | Test second-purchase campaigns |
+| **Spending is concentrated** | Top **10%** of customers generated **38.25%** of monetary value (2017: **38.68%**) | Monitor high-value customer retention |
+| **Delivery performance differs by state** | Overall late rate **6.79%**, with substantial geographic variation | Prioritize high-rate, high-volume markets |
+| **Delays correlate with worse reviews** | Early/on-time reviewed orders averaged **4.29** stars; 4–7 days late averaged **2.11** | Investigate fulfillment and communication issues |
+| **Cohort return rates are low** | Observed later-month retention generally below **1%** | Track cohort-based repeat behavior |
 
-**January 2017 through August 2018**
-
-Key source tables include:
-
-- customers
-- orders
-- order items
-- products
-- sellers
-- payments
-- reviews
-- product category translation
-- geolocation
-
-The analysis focuses primarily on **delivered orders** for completed-sales and fulfillment reporting. All monetary values are denominated in **Brazilian reais (BRL, R$)**, not US dollars.
+These are descriptive findings. The suggested actions should be evaluated with experiments or further analysis rather than interpreted as proven causal effects.
 
 ---
 
-## Project Workflow
+## 🛠️ Tools and workflow
+
+| Tool | Work completed |
+|---|---|
+| **Python / pandas / Jupyter** | Source inspection, cleaning, prepared import files |
+| **MySQL 8+** | Database setup, validation, reusable analytical views, business SQL, RFM and cohort analysis |
+| **Tableau Public** | Four linked dashboards, parameter filters, KPI cards, ranking visuals, cohort heatmap, and tooltips |
+| **Git & GitHub** | Project organization, reproducible SQL, export datasets, workbook, and animated previews |
 
 ```text
-Raw Olist Data
-      ↓
-Python Cleaning Notebook / Prepared CSV Files
-      ↓
-MySQL Database Setup
-      ↓
-Data Validation
-      ↓
-Reusable Analytical Views
-      ↓
-Business & Advanced SQL Analysis
-      ↓
-Tableau-ready Datasets
-      ↓
-4 Interactive Tableau Dashboards
+Olist source CSVs
+       ↓
+Python inspection and preparation
+       ↓
+MySQL setup and validation
+       ↓
+Analytical views and business SQL
+       ↓
+Nine Tableau-ready datasets
+       ↓
+Four interactive dashboards
+       ↓
+Tableau Public
 ```
 
----
-
-## SQL Project Structure
-
-```text
-sql/
-├── 01_database_setup.sql
-├── 02_data_validation.sql
-├── 03_analysis_views.sql
-├── 04_business_analysis.sql
-├── 05_advanced_sql_analysis.sql
-└── 06_tableau_datasets.sql
-```
-
-### 01_database_setup.sql
-
-Creates the MySQL database structure, including:
-
-- tables
-- primary keys
-- foreign keys
-- indexes
-- cleaned-data imports
-- basic load sanity checks
-
-The script uses placeholder local file paths so the project can be cloned and configured on another machine.
-
-### 02_data_validation.sql
-
-Validates the loaded data before analysis.
-
-Checks include:
-
-- actual vs expected row counts
-- primary-key uniqueness
-- composite-key uniqueness
-- foreign-key relationships
-- missing values
-- invalid numeric ranges
-- date-sequence issues
-- category translation coverage
-- customer and seller geolocation coverage
-- index and constraint audits
-
-### 03_analysis_views.sql
-
-Creates reusable analytical views with clearly defined grain.
-
-Important views include:
-
-- `vw_order_item_details`
-- `vw_order_financials`
-- `vw_order_delivery_performance`
-- `vw_order_review_summary`
-- `vw_customer_lifetime_summary`
-- `vw_seller_lifetime_summary`
-
-These views reduce repeated logic and help prevent incorrect joins across tables with different grains.
-
-### 04_business_analysis.sql
-
-Contains the main business-facing analyses, including:
-
-- overall order and financial KPIs
-- delivered-order performance
-- monthly order and payment trends
-- category performance
-- seller performance
-- customer-state performance
-- delivery performance
-- review analysis
-- repeat-customer analysis
-- payment method mix
-- freight burden
-- customer spend bands
-
-### 05_advanced_sql_analysis.sql
-
-Demonstrates more advanced analytical SQL, including:
-
-- RFM scoring and segmentation
-- customer spend concentration
-- category ranking
-- seller ranking within state
-- running payment totals
-- late-delivery outlier ranking
-- month-over-month growth using `LAG()`
-- cohort retention analysis
-
-### 06_tableau_datasets.sql
-
-Creates the final datasets used in Tableau.
-
-Examples include:
-
-- seller risk matrix
-- delivery-review analysis
-- category-review analysis
-- dispatch vs carrier delay
-- overview order-level dataset
-- payment method mix
-- delivery performance by state
-- RFM customers
-- cohort retention
+**SQL concepts:** Joins across different grains · CTEs · recursive CTEs · conditional aggregation · window functions (`ROW_NUMBER`, `NTILE`, `LAG`) · ranking · cumulative calculations · RFM · cohort retention.
 
 ---
 
-## Python Data Preparation
-
-[`notebooks/01_data_preparation.ipynb`](notebooks/01_data_preparation.ipynb) documents inspection, cleaning, cross-table checks, and preparation of cleaned CSV/TSV files for MySQL. Paths are relative to the project layout. Run the notebook before database setup if cleaned inputs are not available.
-
----
-
-## Tableau Dashboards
-
-### 1. Olist E-commerce Performance Overview
-
-![Performance overview dashboard](tableau/screenshots/performance_overview.png)
-
-Focuses on high-level commercial performance.
-
-Includes:
-
-- Total Delivered Orders
-- Total Payment Value
-- Average Order Value
-- Average Items per Order
-- Monthly Orders & Payment Trend
-- State Performance
-- Payment Method Mix
-
-**Headline metrics**
-
-- **96,211 delivered orders**
-- **R$15.38M total payment value (BRL)**
-- **R$159.81 average order value (BRL)**
-- **1.14 average items per order**
-
----
-
-### 2. Olist Delivery Performance Analysis
-
-![Delivery performance dashboard](tableau/screenshots/delivery_performance.png)
-
-**Filter demonstration:**
-
-![Delivery dashboard filter demonstration](tableau/screenshots/delivery_filters.gif)
-
-Focuses on fulfillment and logistics.
-
-Includes:
-
-- Late Rate by State
-- Late Severity Distribution
-- Days Late vs Review Score
-- Dispatch vs Carrier Delay
-- Customer State filter
-- Purchase Date filter
-
-This dashboard separates seller/processing time from carrier delivery time and connects delivery performance with customer reviews.
-
----
-
-### 3. Olist Sellers & Products Performance Analysis
-
-![Sellers and products dashboard](tableau/screenshots/sellers_products.png)
-
-**Filter demonstration:**
-
-![Seller risk interactive filtering demonstration](tableau/screenshots/seller_risk_interaction.gif)
-
-Focuses on seller quality, seller risk, and product-category performance.
-
-Includes:
-
-- Seller Risk Matrix
-- Risk Segment Summary
-- Top Sellers by Product Value
-- Category Performance
-- Seller State filter
-- Risk Segment filter
-
-Seller risk is evaluated using:
-
-- late-delivery rate
-- average review score
-- delivered-order volume
-
-Seller segments include:
-
-- Strong Performers
-- Delivery Risk
-- Satisfaction Risk
-- High Risk
-
----
-
-### 4. Olist Customer Behavior & Retention Analysis
-
-![Customer behavior and retention dashboard](tableau/screenshots/customer_behavior_retention.png)
-
-Focuses on customer quality, repeat purchasing, spend concentration, and retention.
-
-Includes:
-
-- Repeat Purchase Rate
-- RFM Segment Summary
-- Spend Concentration
-- Cohort Retention
-
-The RFM analysis uses:
-
-- **Recency**
-- **Frequency**
-- **Monetary Value**
-
-Customer segments include:
-
-- Champions
-- Loyal Customers
-- Potential Loyalists
-- Recent Customers
-- At Risk
-- Hibernating
-- Others
-
----
-
-## Key Findings
-
-### 1. Repeat purchasing is very low
-
-The repeat purchase rate is approximately **3.0%**.
-
-Most customers in the dataset purchased only once, making retention one of the clearest business challenges in the marketplace.
-
-### 2. Customer frequency is highly concentrated at one purchase
-
-Approximately **97% of customers** placed only one delivered order.
-
-Because frequency is so heavily concentrated, RFM frequency scoring has limited separation compared with a more repeat-heavy business. This is why RFM is treated as supporting analysis rather than the only customer-segmentation method.
-
-### 3. Customer spending varies across the customer base
-
-The cumulative customer-spend chart illustrates how spending is distributed, helping identify higher-value customer groups. In the observed distribution, roughly **52% of customers account for 82% of spending**. This is a descriptive result rather than evidence of an unusually high concentration; a top-10% or top-20% share would make the comparison more informative.
-
-### 4. Cohort retention is very low after the first purchase month
-
-Month 0 begins at 100% by definition, but later monthly retention rates are generally below 1%.
-
-This reinforces the finding that the marketplace is driven primarily by one-time buyers rather than frequent returning customers.
-
-### 5. Delivery delays are associated with customer reviews
-
-The delivery analysis compares delivery timeliness with customer review behavior. Lower average review scores among later deliveries indicate an association worth investigating, but this observational analysis does not establish that a delivery intervention would cause a specific improvement in ratings.
-
-### 6. Seller performance varies across delivery and satisfaction dimensions
-
-The seller risk matrix separates sellers into four groups using late-delivery rate and average review score.
-
-This makes it possible to distinguish between:
-
-- strong sellers
-- sellers with delivery problems
-- sellers with customer-satisfaction problems
-- sellers with both issues
-
----
-
-## Business Recommendations
-
-These are suggested next steps based on the descriptive findings, not measured effects of interventions:
-
-1. **Test second-purchase retention campaigns.** With only about 3% of customers placing multiple delivered orders, pilot post-purchase messaging or targeted incentives and track second-purchase conversion against a comparison group.
-2. **Prioritize delivery improvement by both rate and volume.** Investigate states with high late-delivery rates and sufficient order volumes, then monitor late rates, days late, and review scores over time.
-3. **Use seller risk segments for targeted support.** Review high-risk sellers and distinguish delivery issues from satisfaction issues; compare performance before and after operational changes.
-4. **Monitor monthly acquisition cohorts and customer value.** Track post-acquisition repeat activity alongside spend to identify segments worth testing for retention outreach. Do not interpret month-0 retention (100% by definition) as evidence of loyalty.
-
----
-
-## SQL Concepts Demonstrated
-
-This project includes both foundational and intermediate-to-advanced SQL concepts.
-
-### Core SQL
-
-- `SELECT`
-- `WHERE`
-- `GROUP BY`
-- `HAVING`
-- `ORDER BY`
-- `CASE`
-- aggregate functions
-- date functions
-- inner joins
-- left joins
-
-### Intermediate / Advanced SQL
-
-- Common Table Expressions (CTEs)
-- recursive CTEs
-- reusable SQL views
-- multi-stage aggregation
-- joins across different table grains
-- `ROW_NUMBER()`
-- `DENSE_RANK()`
-- `NTILE()`
-- `LAG()`
-- running totals
-- cumulative percentages
-- cohort analysis
-- RFM segmentation
-- conditional aggregation
-- `COALESCE()`
-- `NULLIF()`
-
----
-
-## Tableau Skills Demonstrated
-
-- KPI design
-- calculated fields
-- table calculations
-- running totals
-- percent-of-total calculations
-- dashboard filters
-- dashboard actions
-- dual-axis charts
-- reference lines
-- heatmaps
-- scatter plots
-- custom tooltips
-- custom number formatting
-- category aliases
-- dashboard layout and formatting
-
----
-
-## Repository Structure
+## 📂 Repository contents
 
 ```text
 olist-ecommerce-analytics/
 ├── README.md
+├── .gitignore
 ├── notebooks/
+│   ├── 01_data_inspection.ipynb
 │   └── 01_data_preparation.ipynb
 ├── sql/
 │   ├── 01_database_setup.sql
@@ -474,77 +116,71 @@ olist-ecommerce-analytics/
 │   ├── 05_advanced_sql_analysis.sql
 │   └── 06_tableau_datasets.sql
 ├── data/
-│   ├── raw/  (local only; excluded from GitHub)
+│   ├── raw/                 # local only, excluded from GitHub
 │   ├── cleaned/
 │   └── tableau_exports/
-│       ├── seller_risk_matrix.csv
-│       ├── delivery_review_analysis.csv
-│       ├── category_review_analysis.csv
-│       ├── dispatch_carrier_analysis.csv
 │       ├── Overview_orders.csv
-│       ├── payment_method_mix.csv
+│       ├── payment_method_mix_by_year.csv
 │       ├── delivery_state_performance.csv
-│       ├── rfm_customers.csv
-│       └── cohort_retention.csv
+│       ├── delivery_review_analysis.csv
+│       ├── dispatch_carrier_analysis.csv
+│       ├── seller_risk_matrix_by_year.csv
+│       ├── category_review_analysis_by_year.csv
+│       ├── rfm_customers_by_year.csv
+│       └── cohort_retention_by_year.csv
 └── tableau/
     ├── Olist_Ecommerce_Analytics.twbx
     └── screenshots/
-        ├── performance_overview.png
-        ├── delivery_performance.png
-        ├── sellers_products.png
-        ├── customer_behavior_retention.png
-        ├── delivery_filters.gif
-        └── seller_risk_interaction.gif
+        ├── Overview Dashboard.gif
+        ├── Delivery Dashboard.gif
+        ├── Seller Dashboard.gif
+        └── Customer Dashboard.gif
 ```
 
-The repository excludes the original raw Olist downloads; source files can be obtained separately. The packaged Tableau workbook includes the data needed to explore the published dashboards.
+### 🗃️ SQL guide
+
+| Script | Purpose |
+|---|---|
+| [`01_database_setup.sql`](sql/01_database_setup.sql) | Create tables, relationships, indexes, and imports |
+| [`02_data_validation.sql`](sql/02_data_validation.sql) | Audit records, keys, missingness, and consistency |
+| [`03_analysis_views.sql`](sql/03_analysis_views.sql) | Define reusable order, financial, delivery, review, and seller views |
+| [`04_business_analysis.sql`](sql/04_business_analysis.sql) | Analyze marketplace and operational performance |
+| [`05_advanced_sql_analysis.sql`](sql/05_advanced_sql_analysis.sql) | Apply ranking, RFM, cumulative calculations, and cohort analysis |
+| [`06_tableau_datasets.sql`](sql/06_tableau_datasets.sql) | Generate the nine final dashboard exports |
 
 ---
 
-## How to Reproduce the Project
+## 🔎 Important methodology notes
 
-1. Obtain the original Olist e-commerce dataset and place the source CSVs in `data/raw/`.
-2. Run `notebooks/01_data_preparation.ipynb` to generate the expected files in `data/cleaned/` (or use the supplied cleaned files if included).
-3. Configure `LOAD DATA LOCAL INFILE` for your MySQL 8+ installation. Replace `/YOUR/LOCAL/PATH/` in `sql/01_database_setup.sql` with the absolute location of the project on your machine.
-4. Run the SQL scripts in numeric order. `02_data_validation.sql` checks the loaded tables; review its results before proceeding.
-5. Export the nine final queries from `sql/06_tableau_datasets.sql` to `data/tableau_exports/`, using the CSV names shown above.
-6. Open `tableau/Olist_Ecommerce_Analytics.twbx` to explore the packaged Tableau dashboards. The packaged workbook may already contain supporting data, so a MySQL setup is not needed just to view it.
-
----
-
-## What I Learned
-
-This project helped strengthen my understanding of how SQL and Tableau work together in a realistic analytics workflow.
-
-The most valuable parts of the project were:
-
-- controlling table grain before joining datasets
-- separating reusable analytical logic into SQL views
-- validating data before analysis
-- using window functions for ranking and cumulative analysis
-- adapting RFM scoring to the actual customer-frequency distribution
-- building cohort retention logic that distinguishes true zero-retention periods from future periods
-- translating SQL outputs into business-facing dashboards rather than treating visualization as a separate step
+- **Reporting:** January 2017–August 2018. Comparisons involving 2018 reflect a partial year.
+- **Delivery eligibility:** 96,203 valid delivery records versus 96,211 delivered orders in the Overview; eight lacked delivery timestamps.
+- **RFM snapshots:** 2017 is measured as of **2018-01-01**; 2018 and All Years share the **2018-09-01** cumulative snapshot. This explains why their customer KPI cards match.
+- **Different value measures:** Payment value includes payments; seller/category *product value* reflects product prices. Customer RFM monetary value has different snapshot eligibility and should not be forced to match Overview payment totals.
+- **Seller segments:** Eligibility is at least 30 delivered orders per period. Thresholds are **5.49%** late-delivery rate and **4.19** average review score.
+- **Reviews:** Order-level reviews can contribute to more than one category when an order contains multiple categories.
+- **Payment type:** Orders may use multiple methods, so payment-type order counts are not additive across types.
+- **Retention:** Month 0 is 100% by definition. Observed months with no return are zero; unobserved future months are blank.
 
 ---
 
-## Future Improvements
+## ▶️ How to reproduce
 
-Possible extensions include:
+1. Obtain the original Brazilian Olist e-commerce CSVs and place them in `data/raw/`.
+2. Run the preparation notebook to generate cleaned imports, where needed.
+3. Configure **MySQL 8+**, enable local CSV imports, and adjust the placeholder paths in [`01_database_setup.sql`](sql/01_database_setup.sql).
+4. Run SQL scripts `01`–`06` in order; review validation results before building the analytical views.
+5. Export the nine queries in [`06_tableau_datasets.sql`](sql/06_tableau_datasets.sql) as the CSVs listed above.
+6. Open the packaged [`Olist_Ecommerce_Analytics.twbx`](tableau/Olist_Ecommerce_Analytics.twbx) or view the [live dashboard](https://public.tableau.com/views/OlistE-CommerceAnalyticsOrdersDeliverySellersCustomers/OlistE-commercePerformanceOverview).
 
-- seller-level geographic mapping
-- freight-cost optimization
-- product-level profitability analysis
-- customer lifetime value modeling
-- predictive late-delivery modeling
-- customer churn or repeat-purchase prediction
+The `.twbx` includes Tableau extracts, so MySQL is not required just to view the dashboards. Raw downloaded datasets are intentionally not included in GitHub.
 
 ---
 
-## Author
+## 🚀 Potential extensions
+
+Seller-level geographic analysis · freight-cost analysis · customer lifetime value modeling · predictive delivery delays · repeat-purchase forecasting.
+
+## 👤 Author
 
 **Parthasarathi Addala**
-
-MS Business Analytics  
-University of Tampa
-
+MS Business Analytics · University of Tampa

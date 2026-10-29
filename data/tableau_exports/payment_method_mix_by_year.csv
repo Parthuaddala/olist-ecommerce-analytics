@@ -1,0 +1,9 @@
+purchase_year,payment_type,payment_records,orders_using_payment_type,total_payment_value,avg_payment_value,avg_installments
+2017,credit_card,33305,33157,5386253.99,161.73,3.74
+2017,boleto,9142,9142,1330026.39,145.49,1.00
+2017,voucher,2872,1850,164661.87,57.33,1.00
+2017,debit_card,406,406,41957.99,103.34,1.00
+2018,credit_card,41071,40938,6676846.60,162.57,3.30
+2018,boleto,9998,9998,1432274.41,143.26,1.00
+2018,voucher,2601,1820,177632.79,68.29,1.00
+2018,debit_card,1078,1077,166221.40,154.19,1.00
